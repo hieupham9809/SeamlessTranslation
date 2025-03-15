@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E55DAFD2D85DCA8007F9484 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E55DAFC2D85DCA8007F9484 /* LLMLib */; };
 		3E9D9A392D7DB293002A85F6 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E9D9A382D7DB293002A85F6 /* LLMLib */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E55DAFD2D85DCA8007F9484 /* LLMLib in Frameworks */,
 				3E9D9A392D7DB293002A85F6 /* LLMLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,6 +81,7 @@
 			name = SeamlessTranslator;
 			packageProductDependencies = (
 				3E9D9A382D7DB293002A85F6 /* LLMLib */,
+				3E55DAFC2D85DCA8007F9484 /* LLMLib */,
 			);
 			productName = SeamlessTranslator;
 			productReference = 3E9D99812D7956D5002A85F6 /* SeamlessTranslator.app */;
@@ -109,7 +112,7 @@
 			mainGroup = 3E9D99782D7956D5002A85F6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3E9D9A372D7DB293002A85F6 /* XCLocalSwiftPackageReference "../LLM/LLMLib" */,
+				3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3E9D99822D7956D5002A85F6 /* Products */;
@@ -335,14 +338,23 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		3E9D9A372D7DB293002A85F6 /* XCLocalSwiftPackageReference "../LLM/LLMLib" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../LLM/LLMLib;
+/* Begin XCRemoteSwiftPackageReference section */
+		3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hieupham9809/coreml-llm-lib";
+			requirement = {
+				kind = revision;
+				revision = 1df93c731881f1f98f2f001046ce5f94ff7341a1;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3E55DAFC2D85DCA8007F9484 /* LLMLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */;
+			productName = LLMLib;
+		};
 		3E9D9A382D7DB293002A85F6 /* LLMLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LLMLib;
