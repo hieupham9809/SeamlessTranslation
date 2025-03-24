@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E55DAFD2D85DCA8007F9484 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E55DAFC2D85DCA8007F9484 /* LLMLib */; };
-		3E9D9A392D7DB293002A85F6 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E9D9A382D7DB293002A85F6 /* LLMLib */; };
+		3E6F7D8C2D91ADF700894224 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6F7D8B2D91ADF700894224 /* LLMLib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E55DAFD2D85DCA8007F9484 /* LLMLib in Frameworks */,
-				3E9D9A392D7DB293002A85F6 /* LLMLib in Frameworks */,
+				3E6F7D8C2D91ADF700894224 /* LLMLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,8 +78,7 @@
 			);
 			name = SeamlessTranslator;
 			packageProductDependencies = (
-				3E9D9A382D7DB293002A85F6 /* LLMLib */,
-				3E55DAFC2D85DCA8007F9484 /* LLMLib */,
+				3E6F7D8B2D91ADF700894224 /* LLMLib */,
 			);
 			productName = SeamlessTranslator;
 			productReference = 3E9D99812D7956D5002A85F6 /* SeamlessTranslator.app */;
@@ -113,6 +110,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */,
+				3E55DB022D886766007F9484 /* XCLocalSwiftPackageReference "LLMLib" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3E9D99822D7956D5002A85F6 /* Products */;
@@ -338,25 +336,28 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		3E55DB022D886766007F9484 /* XCLocalSwiftPackageReference "LLMLib" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = LLMLib;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hieupham9809/coreml-llm-lib";
 			requirement = {
 				kind = revision;
-				revision = 1df93c731881f1f98f2f001046ce5f94ff7341a1;
+				revision = f4352763200e6b92799cf271098538b5bb88ea54;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3E55DAFC2D85DCA8007F9484 /* LLMLib */ = {
+		3E6F7D8B2D91ADF700894224 /* LLMLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */;
-			productName = LLMLib;
-		};
-		3E9D9A382D7DB293002A85F6 /* LLMLib */ = {
-			isa = XCSwiftPackageProductDependency;
 			productName = LLMLib;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -23,6 +23,14 @@ final class TranslationUseCase {
         self._translationMode = translationMode
         self.currentRepository = translationMode.wrappedValue == .web ? self.webRepository : self.localRepository
 
+        // Set up observation for model loading status
+        Task { @MainActor in
+            // Observe the local repository model loading status
+            for await status in localRepository.$modelLoadingStatus.values {
+                self.modelLoadingStatus = status
+            }
+        }
+
         if translationMode.wrappedValue == .local && !selectedRepoID.isEmpty {
             loadLocalModel(repoID: selectedRepoID)
         }
@@ -79,6 +87,12 @@ final class TranslationUseCase {
     }
 
     func loadLocalModel(repoID: String) {
+        // Cancel any previous loading if we're switching to a different model
+        if selectedRepoID != repoID {
+            cancelModelLoading()
+        }
+        
+        selectedRepoID = repoID
         Task {
             await localRepository.loadModel(repoID: repoID)
             Task { @MainActor in
@@ -91,11 +105,21 @@ final class TranslationUseCase {
     }
 
     func switchMode(to mode: TranslationMode) {
+        // If we're switching away from local mode, cancel any ongoing downloads
+        if translationMode == .local && mode == .web {
+            cancelModelLoading()
+        }
+        
         translationMode = mode
         currentRepository = mode == .web ? webRepository : localRepository
         if mode == .local && !selectedRepoID.isEmpty {
             loadLocalModel(repoID: selectedRepoID)
         }
+    }
+
+    // Cancel any ongoing model loading or downloading
+    func cancelModelLoading() {
+        localRepository.cancelModelLoading()
     }
 
     // Forward text limit methods to the current repository

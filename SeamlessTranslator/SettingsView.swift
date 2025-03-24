@@ -39,6 +39,7 @@ struct SettingsView: View {
                 } else {
                     Picker("Local Model", selection: $viewModel.selectedRepoID) {
                         Text("smpanaro/Llama-3.2-1B-Instruct-CoreML").tag("smpanaro/Llama-3.2-1B-Instruct-CoreML")
+//                        Text("andmev/Llama-3.2-3B-Instruct-CoreML").tag("andmev/Llama-3.2-3B-Instruct-CoreML")
                     }
                     .pickerStyle(MenuPickerStyle())
                     .onChange(of: viewModel.selectedRepoID) { newRepoID in
@@ -51,12 +52,50 @@ struct SettingsView: View {
                     case .idle:
                         Text("Select a model to load.")
                     case .loading:
-                        Text("Loading model...")
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Loading model...")
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Button("Cancel") {
+                                viewModel.cancelModelLoading()
+                            }
+                            .padding(.top, 5)
+                        }
+                    case .downloading(let progress):
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Downloading model: \(Int(progress * 100))%")
+                            ProgressView(value: progress)
+                                .progressViewStyle(LinearProgressViewStyle())
+                            Button("Cancel Download") {
+                                viewModel.cancelModelLoading()
+                            }
+                            .padding(.top, 5)
+                        }
+                    case .cancelled:
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Download cancelled")
+                                .foregroundColor(.orange)
+                            Button("Try Again") {
+                                if !viewModel.selectedRepoID.isEmpty {
+                                    viewModel.loadLocalModel(repoID: viewModel.selectedRepoID)
+                                }
+                            }
+                            .padding(.top, 5)
+                        }
                     case .loaded:
                         Text("Model loaded successfully.")
+                            .foregroundColor(.green)
                     case .error(let message):
-                        Text("Error loading model: \(message)")
-                            .foregroundColor(.red)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Error loading model: \(message)")
+                                .foregroundColor(.red)
+                            Button("Try Again") {
+                                if !viewModel.selectedRepoID.isEmpty {
+                                    viewModel.loadLocalModel(repoID: viewModel.selectedRepoID)
+                                }
+                            }
+                            .padding(.top, 5)
+                        }
                     }
                 }
             }
@@ -66,6 +105,7 @@ struct SettingsView: View {
         .background(Color(NSColor.windowBackgroundColor))
         .frame(minWidth: 300, maxHeight: .infinity)
         .animation(.default, value: viewModel.connectionStatus)
+        .animation(.default, value: viewModel.modelLoadingStatus)
     }
 }
 

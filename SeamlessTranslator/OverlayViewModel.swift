@@ -25,7 +25,7 @@ final class OverlayViewModel: ObservableObject {
     @Published var statusMessage: String?
     @MainActor
     @Published var modelLoadingStatus: ModelLoadingStatus = .idle
-    @AppStorage("selectedRepoID") var selectedRepoID: String = ""
+    @AppStorage("selectedRepoID") var selectedRepoID: String = "smpanaro/Llama-3.2-1B-Instruct-CoreML"
     @Published var isStreaming: Bool = false
 
     let languages = LanguageOptions.languages
@@ -56,16 +56,13 @@ final class OverlayViewModel: ObservableObject {
             translationUseCase.apiKey = newValue
         }
     }
-//    {
-//        didSet {
-//            translationUseCase.apiKey = apiKey
-//        }
-//    }
 
     @MainActor
     var isLocalModelLoading: Bool {
         return translationMode == .local && 
-               (modelLoadingStatus == .loading || modelLoadingStatus == .idle)
+               (modelLoadingStatus == .loading || 
+                modelLoadingStatus == .idle || 
+                (modelLoadingStatus == .downloading(progress: 0.0) && downloadProgress != nil))
     }
 
     @MainActor
@@ -75,11 +72,24 @@ final class OverlayViewModel: ObservableObject {
             return "Model not loaded"
         case .loading:
             return "Loading model..."
+        case .downloading(let progress):
+            let percentage = Int(progress * 100)
+            return "Downloading model: \(percentage)%"
         case .loaded:
             return "Model loaded successfully"
+        case .cancelled:
+            return "Download cancelled"
         case .error(let message):
             return "Error loading model: \(message)"
         }
+    }
+
+    @MainActor
+    var downloadProgress: Double? {
+        if case .downloading(let progress) = modelLoadingStatus {
+            return progress
+        }
+        return nil
     }
 
     private func limitInputText() {
@@ -265,13 +275,16 @@ final class OverlayViewModel: ObservableObject {
     }
 
     func loadLocalModel(repoID: String) {
+        selectedRepoID = repoID
         translationUseCase.loadLocalModel(repoID: repoID)
     }
 
     func switchMode(to mode: TranslationMode) {
         translationUseCase.switchMode(to: mode)
-        if mode == .local && !selectedRepoID.isEmpty {
-            loadLocalModel(repoID: selectedRepoID)
-        }
+    }
+
+    // Cancel any ongoing model loading or downloading
+    func cancelModelLoading() {
+        translationUseCase.cancelModelLoading()
     }
 }

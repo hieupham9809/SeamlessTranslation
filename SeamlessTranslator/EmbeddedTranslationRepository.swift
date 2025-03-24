@@ -11,13 +11,17 @@ import LLMLib
 enum ModelLoadingStatus: Equatable {
     case idle
     case loading
+    case downloading(progress: Double)
     case loaded
     case error(String)
+    case cancelled
 
     static func == (lhs: ModelLoadingStatus, rhs: ModelLoadingStatus) -> Bool {
         switch (lhs, rhs) {
-        case (.idle, .idle), (.loading, .loading), (.loaded, .loaded):
+        case (.idle, .idle), (.loading, .loading), (.loaded, .loaded), (.cancelled, .cancelled):
             return true
+        case (.downloading(let lhsProgress), .downloading(let rhsProgress)):
+            return abs(lhsProgress - rhsProgress) < 0.01 // Consider close progress values as equal
         case (.error(let lhsMessage), .error(let rhsMessage)):
             return lhsMessage == rhsMessage
         default:
@@ -31,16 +35,89 @@ final class EmbeddedTranslationRepository: TranslationRepositoryProtocol {
     @Published var modelLoadingStatus: ModelLoadingStatus = .idle
 
     var modelManager: LLMModelManager?
+    private var currentLoadingManager: LLMModelManager?
+    private var loadingTask: Task<Void, Error>?
+
+    // Cancel any ongoing model loading or downloading
+    func cancelModelLoading() {
+        // Cancel the loading task
+        loadingTask?.cancel()
+        loadingTask = nil
+        
+        // Cancel the model download
+        currentLoadingManager?.cancelDownload()
+        currentLoadingManager = nil
+        
+        // Update UI status
+        Task { @MainActor in
+            if case .downloading = modelLoadingStatus  {
+                modelLoadingStatus = .cancelled
+            }
+            else if modelLoadingStatus == .loading {
+                modelLoadingStatus = .cancelled
+            }
+        }
+    }
 
     func loadModel(repoID: String) async {
+        // Cancel any previous loading task
+        cancelModelLoading()
+        
+        // Set status to loading and create a new manager
         modelLoadingStatus = .loading
         let manager = LLMModelManager()
-        do {
-            try await manager.loadModel(repoID: repoID)
-            modelManager = manager
-            modelLoadingStatus = .loaded
-        } catch {
-            modelLoadingStatus = .error(error.localizedDescription)
+        currentLoadingManager = manager
+        
+        // Create a loading task that can be cancelled
+        loadingTask = Task.detached { [weak self] in
+            do {
+                // Use a local progress handler
+                let modelPrefix = repoID.split(separator: "/").last?.replacingOccurrences(of: "-CoreML", with: "")
+                try await manager.loadModel(repoID: repoID, localModelPrefix: modelPrefix, progressHandler: { progress in
+                    Task { @MainActor in
+                        // Update progress only if we're still loading
+                        if let self = self, 
+                           self.currentLoadingManager === manager {
+                            self.modelLoadingStatus = .downloading(progress: progress)
+                        }
+                    }
+                })
+                
+                // Success - update state on main actor
+                await MainActor.run { [weak self] in
+                    guard let self = self else { return }
+                    if self.currentLoadingManager === manager {
+                        self.modelManager = manager
+                        self.modelLoadingStatus = .loaded
+                        self.currentLoadingManager = nil
+                    }
+                }
+            } catch {
+                // Handle errors on main actor
+                await MainActor.run { [weak self] in
+                    guard let self = self else { return }
+                    // Only update status if this is the current manager
+                    if self.currentLoadingManager === manager {
+                        if let error = error as? LLMModelManagerError, error == .cancelled {
+                            self.modelLoadingStatus = .cancelled
+                        } else if Task.isCancelled {
+                            self.modelLoadingStatus = .cancelled
+                        } else {
+                            self.modelLoadingStatus = .error(error.localizedDescription)
+                        }
+                        self.currentLoadingManager = nil
+                    }
+                }
+            }
+        }
+        
+        // Set up a task to monitor for cancellation
+        Task {
+            // Wait a bit to check for early cancellation (e.g. user changed model or switched mode right away)
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            if Task.isCancelled || loadingTask?.isCancelled == true {
+                cancelModelLoading()
+            }
         }
     }
 
