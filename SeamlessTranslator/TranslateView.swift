@@ -72,7 +72,7 @@ struct TranslateView: View {
                     .disabled(viewModel.inputText.isEmpty || viewModel.isLocalModelLoading)
                 }
             }
-            .padding([.leading, .trailing])
+            .padding()
 
             HStack {
                 Picker("From:", selection: $viewModel.sourceLanguage) {
@@ -94,49 +94,60 @@ struct TranslateView: View {
             .padding([.leading, .trailing])
 
             ScrollViewReader { scrollProxy in
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        // Make output text selectable
-                        Text(viewModel.outputText)
-                            .font(.system(size: 22, weight: .semibold))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                            .animation(.easeInOut(duration: 0.1), value: viewModel.outputText)
-                            .contextMenu {
-                                Button("Copy") {
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(viewModel.outputText, forType: .string)
-                                    showCopyNotification = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showCopyNotification = false
-                                    }
+                ZStack(alignment: .topTrailing) {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+
+                            // Make output text selectable
+                            Text(viewModel.outputText)
+                                .font(.system(size: 22, weight: .semibold))
+                                .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
+                                .padding(.horizontal)
+                                .animation(.easeInOut(duration: 0.1), value: viewModel.outputText)
+                                .background(Color.white.opacity(0.01)) // Invisible background for tap gesture
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
+                                .shadow(radius: 5)
+
+                            if viewModel.isStreaming {
+                                HStack {
+                                    Text("Generating")
+                                        .foregroundColor(.secondary)
+                                    TypingIndicator()
                                 }
+                                .padding(.horizontal)
+                                .padding(.bottom, 4)
+                                .id(bottomID) // Add ID to the bottom element
+                            } else {
+                                // Add an empty spacer with the bottom ID when not streaming
+                                Color.clear
+                                    .frame(height: 1)
+                                    .id(bottomID)
                             }
-                        
-                        if viewModel.isStreaming {
-                            HStack {
-                                Text("Generating")
-                                    .foregroundColor(.secondary)
-                                TypingIndicator()
-                            }
-                            .padding(.horizontal)
-                            .padding(.bottom, 8)
-                            .id(bottomID) // Add ID to the bottom element
-                        } else {
-                            // Add an empty spacer with the bottom ID when not streaming
-                            Color.clear
-                                .frame(height: 1)
-                                .id(bottomID)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white.opacity(0.01)) // Invisible background for tap gesture
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray, lineWidth: 1)
-                    )
-                    .shadow(radius: 5)
+
+                    // Add a copy button to the top right corner
+                    Button(action: {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(viewModel.outputText, forType: .string)
+                        showCopyNotification = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showCopyNotification = false
+                        }
+                    }) {
+                        Image(systemName: "doc.on.doc") // Use a suitable SF Symbol for copy
+                            .foregroundColor(.blue)
+                            .padding(8)
+                            .background(.clear)
+                            .cornerRadius(5)
+                            .shadow(radius: 2)
+                    }
+                    .buttonStyle(.borderless)
                 }
                 .onChange(of: viewModel.outputText) { _ in
                     // Scroll to the bottom ID
@@ -161,11 +172,10 @@ struct TranslateView: View {
                     .padding()
             }
 
-            HStack(spacing: 16) {
+            HStack(spacing: 0) {
                 if showCopyNotification {
                     Text("Content copied to clipboard!")
                         .foregroundColor(.green)
-                        .padding(.vertical, 4)
                         .transition(.opacity)
                 }
                 
@@ -175,10 +185,10 @@ struct TranslateView: View {
                         ""
                     Text("Quick Paste activated! (⌘+⇧+P)\(action)")
                         .foregroundColor(.green)
-                        .padding(.vertical, 4)
                         .transition(.opacity)
                 }
             }
+            .frame(height: 25)
             .animation(.default, value: showCopyNotification)
             .animation(.default, value: showQuickPasteNotification)
             .padding(.bottom, 8)

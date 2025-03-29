@@ -12,7 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Create the overlay window
         overlayWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 300, width: 400, height: 300),
+            contentRect: NSRect(x: 0, y: 400, width: 400, height: 300),
             styleMask: [.titled, .resizable, .fullSizeContentView],
             backing: .buffered, defer: false)
         overlayWindow.isOpaque = false
