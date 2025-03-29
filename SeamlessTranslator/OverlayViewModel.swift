@@ -6,6 +6,11 @@ enum TranslationMode: String {
     case local = "Local Model"
 }
 
+enum QuickPasteAction: Int {
+    case translate = 0
+    case rephrase = 1
+}
+
 final class OverlayViewModel: ObservableObject {
     @Published var inputText: String = "" {
         didSet {
@@ -27,6 +32,12 @@ final class OverlayViewModel: ObservableObject {
     @Published var modelLoadingStatus: ModelLoadingStatus = .idle
     @AppStorage("selectedRepoID") var selectedRepoID: String = "smpanaro/Llama-3.2-1B-Instruct-CoreML"
     @Published var isStreaming: Bool = false
+    @AppStorage("autoTranslateOnPaste") var autoTranslateOnPaste: Bool = false
+
+    // Quick Paste settings
+    @AppStorage("quickPasteEnabled") var quickPasteEnabled: Bool = true
+    @AppStorage("autoProcessAfterPaste") var autoProcessAfterPaste: Bool = false
+    @AppStorage("quickPasteAction") var quickPasteAction: QuickPasteAction = .translate
 
     let languages = LanguageOptions.languages
 
@@ -286,5 +297,23 @@ final class OverlayViewModel: ObservableObject {
     // Cancel any ongoing model loading or downloading
     func cancelModelLoading() {
         translationUseCase.cancelModelLoading()
+    }
+
+    // Handle quick paste with optional processing based on settings
+    @MainActor
+    func handleQuickPaste(text: String) {
+        inputText = text
+        
+        // Check if quick paste is enabled
+        guard quickPasteEnabled else { return }
+        
+        // Auto-process if enabled and not already processing
+        if autoProcessAfterPaste && !text.isEmpty && !isLocalModelLoading && !isStreaming {
+            if quickPasteAction == .translate {
+                translateText()
+            } else {
+                rephraseText()
+            }
+        }
     }
 }

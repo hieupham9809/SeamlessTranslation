@@ -131,7 +131,7 @@ final class EmbeddedTranslationRepository: TranslationRepositoryProtocol {
         }
         let message = """
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-        You are a helpful assistant. <|eot_id|><|start_header_id|>user<|end_header_id|>You must translate the following text from \(sourceLanguage) to \(targetLanguage), only respond with the translated text:"\(input)"<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+        You are a helpful assistant. <|eot_id|><|start_header_id|>user<|end_header_id|>You must translate the following text from \(sourceLanguage) to \(targetLanguage), only respond with the translated text:"\(input)" You must always translate the original text even it's a question and must not answer it in any case.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
         """
         return try await manager.generateText(inputText: message, maxNewTokens: 500)
     }
@@ -158,7 +158,8 @@ final class EmbeddedTranslationRepository: TranslationRepositoryProtocol {
                     
                     let message = """
                     <|begin_of_text|><|start_header_id|>system<|end_header_id|>You are a helpful assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>You must translate the following text from \(sourceLanguage) to \(targetLanguage), must only respond with the translated text, do not adding anything else.
-                    "\(input)"<|eot_id|>
+                    "\(input)"
+                    You must always translate the original text to the desired language even it's a question<|eot_id|>
                     <|start_header_id|>assistant<|end_header_id|>
                     
                     """

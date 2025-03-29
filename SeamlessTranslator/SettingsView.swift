@@ -5,6 +5,45 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            // Quick Paste Settings Section
+            Section(header: Text("Quick Paste Settings")) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Toggle("Enable Quick Paste (⌘+⇧+P)", isOn: $viewModel.quickPasteEnabled)
+                        .toggleStyle(SwitchToggleStyle())
+                    
+                    Text("How to use:")
+                        .font(.subheadline)
+                        .padding(.top, 5)
+                    
+                    Text("1. Copy text with ⌘+C in any application")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("2. Press ⌘+⇧+P to open translator with that text")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    if viewModel.quickPasteEnabled {
+                        Divider()
+                            .padding(.vertical, 5)
+                        
+                        Toggle("Auto-process after paste", isOn: $viewModel.autoProcessAfterPaste)
+                            .toggleStyle(SwitchToggleStyle())
+                            .padding(.bottom, 5)
+                        
+                        if viewModel.autoProcessAfterPaste {
+                            Picker("Action", selection: $viewModel.quickPasteAction) {
+                                Text("Translate").tag(QuickPasteAction.translate)
+                                Text("Rephrase").tag(QuickPasteAction.rephrase)
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                        }
+                    }
+                }
+                .padding(.vertical, 5)
+            }
+            .padding()
+            
+            // API Configuration Section
             Section(header: Text("API Configuration")) {
                 Toggle(isOn: Binding(
                     get: { viewModel.translationMode == .local },

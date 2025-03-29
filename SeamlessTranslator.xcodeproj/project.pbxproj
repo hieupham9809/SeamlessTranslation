@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3E6F7D8C2D91ADF700894224 /* LLMLib in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6F7D8B2D91ADF700894224 /* LLMLib */; };
+		3E6F7DAF2D930EDD00894224 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = 3E6F7DAE2D930EDD00894224 /* HotKey */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E6F7DAF2D930EDD00894224 /* HotKey in Frameworks */,
 				3E6F7D8C2D91ADF700894224 /* LLMLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,6 +81,7 @@
 			name = SeamlessTranslator;
 			packageProductDependencies = (
 				3E6F7D8B2D91ADF700894224 /* LLMLib */,
+				3E6F7DAE2D930EDD00894224 /* HotKey */,
 			);
 			productName = SeamlessTranslator;
 			productReference = 3E9D99812D7956D5002A85F6 /* SeamlessTranslator.app */;
@@ -111,6 +114,7 @@
 			packageReferences = (
 				3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */,
 				3E55DB022D886766007F9484 /* XCLocalSwiftPackageReference "LLMLib" */,
+				3E6F7DAD2D930EDD00894224 /* XCRemoteSwiftPackageReference "HotKey" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3E9D99822D7956D5002A85F6 /* Products */;
@@ -271,6 +275,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SeamlessTranslator/Preview Content\"";
+				DEVELOPMENT_TEAM = X5P7HK39AN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -352,6 +357,14 @@
 				revision = f4352763200e6b92799cf271098538b5bb88ea54;
 			};
 		};
+		3E6F7DAD2D930EDD00894224 /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				kind = exactVersion;
+				version = 0.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -359,6 +372,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3E55DAFB2D85DCA8007F9484 /* XCRemoteSwiftPackageReference "coreml-llm-lib" */;
 			productName = LLMLib;
+		};
+		3E6F7DAE2D930EDD00894224 /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3E6F7DAD2D930EDD00894224 /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

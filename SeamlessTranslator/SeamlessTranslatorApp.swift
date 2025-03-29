@@ -6,7 +6,7 @@ struct SeamlessTranslatorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            // No main window, only overlay window
+            EmptyView()
         }
     }
 }

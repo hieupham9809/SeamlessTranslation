@@ -4,6 +4,7 @@ struct TranslateView: View {
     @ObservedObject var viewModel: OverlayViewModel
     @State private var showCopyNotification = false
     @State private var translatedTextHeight: CGFloat = 0
+    @State private var showQuickPasteNotification = false
     
     // Add a constant ID for the bottom content
     private let bottomID = "BOTTOM_ID"
@@ -19,6 +20,15 @@ struct TranslateView: View {
                 .cornerRadius(8)
                 .shadow(radius: 5)
                 .disabled(viewModel.isStreaming || viewModel.isLocalModelLoading)
+                .onReceive(NotificationCenter.default.publisher(for: Notification.Name("QuickPasteEvent"))) { notification in
+                    if let text = notification.userInfo?["text"] as? String {
+                        viewModel.handleQuickPaste(text: text)
+                        showQuickPasteNotification = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showQuickPasteNotification = false
+                        }
+                    }
+                }
 
             // Word counter using properties from the view model
             HStack {
@@ -151,12 +161,27 @@ struct TranslateView: View {
                     .padding()
             }
 
-            if showCopyNotification {
-                Text("Content copied to clipboard!")
-                    .foregroundColor(.green)
-                    .padding()
-                    .transition(.opacity)
+            HStack(spacing: 16) {
+                if showCopyNotification {
+                    Text("Content copied to clipboard!")
+                        .foregroundColor(.green)
+                        .padding(.vertical, 4)
+                        .transition(.opacity)
+                }
+                
+                if showQuickPasteNotification {
+                    let action = viewModel.autoProcessAfterPaste ? 
+                        (viewModel.quickPasteAction == .translate ? " - Auto-translating..." : " - Auto-rephrasing...") : 
+                        ""
+                    Text("Quick Paste activated! (⌘+⇧+P)\(action)")
+                        .foregroundColor(.green)
+                        .padding(.vertical, 4)
+                        .transition(.opacity)
+                }
             }
+            .animation(.default, value: showCopyNotification)
+            .animation(.default, value: showQuickPasteNotification)
+            .padding(.bottom, 8)
         }
         .frame(minWidth: 400)
         .animation(.default, value: viewModel.outputText)
